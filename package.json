@@ -1,6 +1,6 @@
 {
   "name": "@shapeshift-labs/frontier-dataflow",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Serializable incremental dataflow and materialized-view graphs for Frontier apps.",
   "type": "module",
   "license": "MIT",
