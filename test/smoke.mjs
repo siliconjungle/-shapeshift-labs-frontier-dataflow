@@ -2,6 +2,9 @@ import assert from 'node:assert';
 import {
   compileDataflow,
   createDataflowGraph,
+  createDataflowAutonomousQueueView,
+  createDataflowAutonomousQueueUtilization,
+  createDataflowModelRoutingRecommendations,
   createDataflowProof,
   createDataflowRegistryGraph,
   decodeDataflowJsonl,
@@ -112,3 +115,122 @@ const jsonl = encodeDataflowJsonl([plan, next]);
 assert.strictEqual(decodeDataflowJsonl(jsonl).length, 2);
 assert.notStrictEqual(createDataflowProof(graph, { generatedAt: 1 }).hash.length, 0);
 assert.strictEqual(JSON.stringify(redactDataflowValue(graph)).includes('secret'), false);
+
+const autonomousQueueView = createDataflowAutonomousQueueView({
+  id: 'autonomous-merge.queue-view',
+  queueItems: [
+    { id: 'queue:queued', status: 'queued' },
+    { id: 'queue:active', status: 'active' },
+    { id: 'queue:review-debt', status: 'human-question' }
+  ],
+  leases: [
+    { id: 'queue:active', status: 'active' },
+    { id: 'queue:draining', status: 'draining' }
+  ],
+  semanticRows: [
+    { id: 'queue:drained', status: 'drained' },
+    { id: 'queue:rerun', status: 'rerun' },
+    { id: 'queue:conflicted', status: 'conflict' },
+    { id: 'queue:questioned', status: 'review', question: 'Approve the rerun?' }
+  ],
+  terminalDecisions: [
+    { id: 'queue:drained', decision: 'drained' },
+    { id: 'queue:retired', decision: 'retired' }
+  ]
+});
+
+assert.strictEqual(autonomousQueueView.kind, 'frontier.dataflow.autonomous-queue-view');
+assert.strictEqual(autonomousQueueView.version, 1);
+assert.strictEqual(autonomousQueueView.summary.totalCount, 9);
+assert.strictEqual(autonomousQueueView.summary.liveCount, 4);
+assert.strictEqual(autonomousQueueView.summary.historicalCount, 5);
+assert.strictEqual(autonomousQueueView.summary.active, 1);
+assert.strictEqual(autonomousQueueView.summary.queued, 1);
+assert.strictEqual(autonomousQueueView.summary.draining, 2);
+assert.strictEqual(autonomousQueueView.summary.drained, 1);
+assert.strictEqual(autonomousQueueView.summary.rerun, 1);
+assert.strictEqual(autonomousQueueView.summary.conflicted, 1);
+assert.strictEqual(autonomousQueueView.summary.humanQuestion, 1);
+assert.strictEqual(autonomousQueueView.summary.retired, 1);
+assert.strictEqual(autonomousQueueView.summary.queueItemCount, 3);
+assert.strictEqual(autonomousQueueView.summary.leaseCount, 2);
+assert.strictEqual(autonomousQueueView.summary.semanticRowCount, 4);
+assert.strictEqual(autonomousQueueView.summary.terminalDecisionCount, 2);
+
+const autonomousQueueUtilization = createDataflowAutonomousQueueUtilization({
+  id: 'autonomous-merge.utilization',
+  events: [
+    { id: 'sample:30', observedAt: 30, activeCount: 1, totalCount: 4 },
+    { id: 'sample:15', observedAt: 15, activeCount: 1, totalCount: 4 }
+  ],
+  snapshots: [
+    {
+      id: 'sample:30',
+      observedAt: 30,
+      queueItems: [
+        { id: 'queue:active-a', status: 'active' },
+        { id: 'queue:active-b', status: 'active' },
+        { id: 'queue:queued-a', status: 'queued' },
+        { id: 'queue:queued-b', status: 'queued' }
+      ],
+      capacity: 8
+    }
+  ],
+  queueSnapshots: [
+    {
+      id: 'sample:10',
+      observedAt: 10,
+      queueItems: [
+        { id: 'queue:active-a', status: 'active' },
+        { id: 'queue:queued-a', status: 'queued' }
+      ],
+      capacity: 8
+    }
+  ]
+});
+
+assert.strictEqual(autonomousQueueUtilization.kind, 'frontier.dataflow.autonomous-queue-utilization');
+assert.strictEqual(autonomousQueueUtilization.version, 1);
+assert.strictEqual(autonomousQueueUtilization.summary.sampleCount, 3);
+assert.strictEqual(autonomousQueueUtilization.summary.eventCount, 2);
+assert.strictEqual(autonomousQueueUtilization.summary.snapshotCount, 2);
+assert.strictEqual(autonomousQueueUtilization.summary.earliestObservedAt, 10);
+assert.strictEqual(autonomousQueueUtilization.summary.latestObservedAt, 30);
+assert.strictEqual(autonomousQueueUtilization.summary.minUtilization, 0.25);
+assert.strictEqual(autonomousQueueUtilization.summary.maxUtilization, 0.5);
+assert.strictEqual(autonomousQueueUtilization.summary.latestUtilization, 0.5);
+assert.strictEqual(autonomousQueueUtilization.samples[0].observedAt, 10);
+assert.strictEqual(autonomousQueueUtilization.samples[0].utilization, 0.25);
+assert.strictEqual(autonomousQueueUtilization.samples[1].observedAt, 15);
+assert.strictEqual(autonomousQueueUtilization.samples[1].utilization, 0.25);
+assert.strictEqual(autonomousQueueUtilization.samples[2].observedAt, 30);
+assert.strictEqual(autonomousQueueUtilization.samples[2].active, 2);
+assert.strictEqual(autonomousQueueUtilization.samples[2].queued, 2);
+assert.strictEqual(autonomousQueueUtilization.samples[2].liveCount, 4);
+assert.strictEqual(autonomousQueueUtilization.samples[2].utilization, 0.5);
+
+const modelRoutingRecommendations = createDataflowModelRoutingRecommendations({
+  id: 'model-routing.recommendations',
+  windowSize: 2,
+  minimumSamples: 2,
+  outcomes: [
+    { id: 'mini:1', modelId: 'gpt-5.4-mini', outcome: 'failed', score: 0.12, latencyMs: 320, costUsd: 0.05, observedAt: 1 },
+    { id: 'mini:2', modelId: 'gpt-5.4-mini', outcome: 'failed', score: 0.25, latencyMs: 300, costUsd: 0.05, observedAt: 2 },
+    { id: 'mini:3', modelId: 'gpt-5.4-mini', outcome: 'success', score: 0.91, latencyMs: 140, costUsd: 0.05, observedAt: 3 },
+    { id: 'mini:4', modelId: 'gpt-5.4-mini', outcome: 'success', score: 0.95, latencyMs: 120, costUsd: 0.05, observedAt: 4 },
+    { id: 'deep:1', modelId: 'gpt-5.4-deep', outcome: 'failed', score: 0.2, latencyMs: 500, costUsd: 0.18, observedAt: 1 },
+    { id: 'deep:2', modelId: 'gpt-5.4-deep', outcome: 'failed', score: 0.15, latencyMs: 520, costUsd: 0.18, observedAt: 2 }
+  ]
+});
+
+assert.strictEqual(modelRoutingRecommendations.kind, 'frontier.dataflow.model-routing-recommendations');
+assert.strictEqual(modelRoutingRecommendations.summary.modelCount, 2);
+assert.strictEqual(modelRoutingRecommendations.summary.outcomeCount, 6);
+assert.strictEqual(modelRoutingRecommendations.summary.windowedOutcomeCount, 4);
+assert.strictEqual(modelRoutingRecommendations.summary.promoteCount, 1);
+assert.strictEqual(modelRoutingRecommendations.summary.deprioritizeCount, 1);
+assert.strictEqual(modelRoutingRecommendations.recommendations[0].modelId, 'gpt-5.4-mini');
+assert.strictEqual(modelRoutingRecommendations.recommendations[0].recommendation, 'promote');
+assert.ok(modelRoutingRecommendations.recommendations[0].reason.includes('rolling score'));
+assert.strictEqual(modelRoutingRecommendations.recommendations[1].modelId, 'gpt-5.4-deep');
+assert.strictEqual(modelRoutingRecommendations.recommendations[1].recommendation, 'deprioritize');

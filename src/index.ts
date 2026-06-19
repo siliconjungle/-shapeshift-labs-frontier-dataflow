@@ -22,6 +22,12 @@ export const FRONTIER_DATAFLOW_MATERIALIZATION_KIND = 'frontier.dataflow.materia
 export const FRONTIER_DATAFLOW_MATERIALIZATION_VERSION = 1;
 export const FRONTIER_DATAFLOW_PROOF_KIND = 'frontier.dataflow.proof';
 export const FRONTIER_DATAFLOW_PROOF_VERSION = 1;
+export const FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_VIEW_KIND = 'frontier.dataflow.autonomous-queue-view';
+export const FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_VIEW_VERSION = 1;
+export const FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_UTILIZATION_KIND = 'frontier.dataflow.autonomous-queue-utilization';
+export const FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_UTILIZATION_VERSION = 1;
+export const FRONTIER_DATAFLOW_MODEL_ROUTING_RECOMMENDATIONS_KIND = 'frontier.dataflow.model-routing-recommendations';
+export const FRONTIER_DATAFLOW_MODEL_ROUTING_RECOMMENDATIONS_VERSION = 1;
 
 export type FrontierDataflowNodeType =
   | 'source'
@@ -294,6 +300,257 @@ export interface FrontierDataflowProof {
   hash: string;
   summary: FrontierDataflowSummary | FrontierDataflowRecomputeBudget;
   validation?: FrontierDataflowValidation;
+  metadata?: JsonObject;
+}
+
+export interface FrontierDataflowAutonomousQueueRecordInput {
+  id?: string;
+  queueItemId?: string;
+  leaseId?: string;
+  semanticRowId?: string;
+  decisionId?: string;
+  taskId?: string;
+  status?: unknown;
+  state?: unknown;
+  phase?: unknown;
+  lane?: unknown;
+  decision?: unknown;
+  terminalDecision?: unknown;
+  result?: unknown;
+  outcome?: unknown;
+  type?: unknown;
+  reason?: unknown;
+  summary?: unknown;
+  note?: unknown;
+  message?: unknown;
+  question?: unknown;
+  humanQuestion?: unknown;
+  questionId?: unknown;
+  questionCode?: unknown;
+  retired?: unknown;
+  archived?: unknown;
+  superseded?: unknown;
+  obsolete?: unknown;
+  conflict?: unknown;
+  conflicted?: unknown;
+  rerun?: unknown;
+  drained?: unknown;
+  draining?: unknown;
+  active?: unknown;
+  queued?: unknown;
+  metadata?: unknown;
+}
+
+export interface FrontierDataflowAutonomousQueueViewInput {
+  id?: string;
+  title?: string;
+  description?: string;
+  queueItems?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  leases?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  semanticRows?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  terminalDecisions?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  metadata?: unknown;
+}
+
+export interface FrontierDataflowAutonomousQueueLaneCounts {
+  active: number;
+  queued: number;
+  draining: number;
+  drained: number;
+  rerun: number;
+  conflicted: number;
+  humanQuestion: number;
+  retired: number;
+}
+
+export interface FrontierDataflowAutonomousQueueViewSummary extends FrontierDataflowAutonomousQueueLaneCounts {
+  totalCount: number;
+  liveCount: number;
+  historicalCount: number;
+  queueItemCount: number;
+  leaseCount: number;
+  semanticRowCount: number;
+  terminalDecisionCount: number;
+}
+
+export interface FrontierDataflowAutonomousQueueView {
+  kind: typeof FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_VIEW_KIND;
+  version: typeof FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_VIEW_VERSION;
+  id: string;
+  title?: string;
+  description?: string;
+  summary: FrontierDataflowAutonomousQueueViewSummary;
+  metadata?: JsonObject;
+}
+
+export type FrontierDataflowAutonomousQueueUtilizationSource = 'event' | 'snapshot';
+
+export interface FrontierDataflowAutonomousQueueUtilizationSampleInput {
+  id?: string;
+  kind?: FrontierDataflowAutonomousQueueUtilizationSource | string;
+  observedAt?: unknown;
+  timestamp?: unknown;
+  time?: unknown;
+  queueItems?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  leases?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  semanticRows?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  terminalDecisions?: readonly FrontierDataflowAutonomousQueueRecordInput[];
+  liveCount?: unknown;
+  active?: unknown;
+  activeCount?: unknown;
+  queued?: unknown;
+  queuedCount?: unknown;
+  draining?: unknown;
+  drainingCount?: unknown;
+  drained?: unknown;
+  drainedCount?: unknown;
+  rerun?: unknown;
+  rerunCount?: unknown;
+  conflicted?: unknown;
+  conflictedCount?: unknown;
+  humanQuestion?: unknown;
+  humanQuestionCount?: unknown;
+  retired?: unknown;
+  retiredCount?: unknown;
+  total?: unknown;
+  totalCount?: unknown;
+  capacity?: unknown;
+  metadata?: unknown;
+}
+
+export interface FrontierDataflowAutonomousQueueUtilizationInput {
+  id?: string;
+  title?: string;
+  description?: string;
+  events?: readonly FrontierDataflowAutonomousQueueUtilizationSampleInput[];
+  snapshots?: readonly FrontierDataflowAutonomousQueueUtilizationSampleInput[];
+  queueSnapshots?: readonly FrontierDataflowAutonomousQueueUtilizationSampleInput[];
+  metadata?: unknown;
+}
+
+export interface FrontierDataflowAutonomousQueueUtilizationSample {
+  id: string;
+  kind: FrontierDataflowAutonomousQueueUtilizationSource;
+  observedAt?: number;
+  active: number;
+  queued: number;
+  draining: number;
+  drained: number;
+  rerun: number;
+  conflicted: number;
+  humanQuestion: number;
+  retired: number;
+  liveCount: number;
+  totalCount: number;
+  capacity?: number;
+  utilization: number;
+  metadata?: JsonObject;
+}
+
+export interface FrontierDataflowAutonomousQueueUtilizationSummary {
+  sampleCount: number;
+  eventCount: number;
+  snapshotCount: number;
+  earliestObservedAt?: number;
+  latestObservedAt?: number;
+  minUtilization: number;
+  averageUtilization: number;
+  maxUtilization: number;
+  latestUtilization: number;
+  peakUtilization: number;
+  peakObservedAt?: number;
+}
+
+export interface FrontierDataflowAutonomousQueueUtilization {
+  kind: typeof FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_UTILIZATION_KIND;
+  version: typeof FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_UTILIZATION_VERSION;
+  id: string;
+  title?: string;
+  description?: string;
+  summary: FrontierDataflowAutonomousQueueUtilizationSummary;
+  samples: FrontierDataflowAutonomousQueueUtilizationSample[];
+  metadata?: JsonObject;
+}
+
+export type FrontierDataflowModelRoutingRecommendationVerdict = 'promote' | 'hold' | 'deprioritize';
+export type FrontierDataflowModelRoutingRecommendationTrend = 'improving' | 'stable' | 'declining';
+
+export interface FrontierDataflowModelRoutingOutcomeInput {
+  id?: string;
+  modelId?: string;
+  status?: unknown;
+  result?: unknown;
+  decision?: unknown;
+  outcome?: unknown;
+  recommendation?: unknown;
+  succeeded?: unknown;
+  score?: unknown;
+  latencyMs?: unknown;
+  costUsd?: unknown;
+  observedAt?: unknown;
+  metadata?: unknown;
+}
+
+export interface FrontierDataflowModelRoutingOutcome {
+  id: string;
+  modelId: string;
+  status?: string;
+  success?: boolean;
+  score?: number;
+  latencyMs?: number;
+  costUsd?: number;
+  observedAt?: number;
+  metadata?: JsonObject;
+}
+
+export interface FrontierDataflowModelRoutingRecommendationsInput {
+  id?: string;
+  title?: string;
+  description?: string;
+  outcomes?: readonly FrontierDataflowModelRoutingOutcomeInput[];
+  windowSize?: number;
+  minimumSamples?: number;
+  promoteThreshold?: number;
+  deprioritizeThreshold?: number;
+  metadata?: unknown;
+}
+
+export interface FrontierDataflowModelRoutingRecommendation {
+  modelId: string;
+  outcomeCount: number;
+  windowedOutcomeCount: number;
+  successCount: number;
+  failureCount: number;
+  successRate: number;
+  averageScore: number;
+  averageLatencyMs: number;
+  averageCostUsd: number;
+  trend: FrontierDataflowModelRoutingRecommendationTrend;
+  recommendation: FrontierDataflowModelRoutingRecommendationVerdict;
+  reason: string;
+  lastObservedAt?: number;
+  metadata?: JsonObject;
+}
+
+export interface FrontierDataflowModelRoutingRecommendationsSummary {
+  modelCount: number;
+  outcomeCount: number;
+  windowedOutcomeCount: number;
+  windowSize: number;
+  minimumSamples: number;
+  promoteCount: number;
+  holdCount: number;
+  deprioritizeCount: number;
+}
+
+export interface FrontierDataflowModelRoutingRecommendations {
+  kind: typeof FRONTIER_DATAFLOW_MODEL_ROUTING_RECOMMENDATIONS_KIND;
+  version: typeof FRONTIER_DATAFLOW_MODEL_ROUTING_RECOMMENDATIONS_VERSION;
+  id: string;
+  title?: string;
+  description?: string;
+  summary: FrontierDataflowModelRoutingRecommendationsSummary;
+  recommendations: FrontierDataflowModelRoutingRecommendation[];
   metadata?: JsonObject;
 }
 
@@ -699,6 +956,116 @@ export function createDataflowProof(
     summary: isDataflowGraph(value) ? value.summary : value.recomputeBudget,
     ...(isDataflowGraph(value) ? { validation: validateDataflowGraph(value) } : {}),
     ...optionalObject('metadata', options.metadata)
+  };
+}
+
+export function createDataflowAutonomousQueueView(
+  input: FrontierDataflowAutonomousQueueViewInput = {}
+): FrontierDataflowAutonomousQueueView {
+  const queueItems = normalizeAutonomousQueueRecords(input.queueItems ?? [], 'queue-item');
+  const leases = normalizeAutonomousQueueRecords(input.leases ?? [], 'lease');
+  const semanticRows = normalizeAutonomousQueueRecords(input.semanticRows ?? [], 'semantic-row');
+  const terminalDecisions = normalizeAutonomousQueueRecords(input.terminalDecisions ?? [], 'terminal-decision');
+  const recordsById = new Map<string, FrontierDataflowAutonomousQueueRankedRecord>();
+  for (const record of queueItems.concat(leases, semanticRows, terminalDecisions)) {
+    const previous = recordsById.get(record.id);
+    if (!previous || record.rank > previous.rank || (record.rank === previous.rank && record.sequence > previous.sequence)) {
+      recordsById.set(record.id, record);
+    }
+  }
+
+  const summary = summarizeAutonomousQueueView(Array.from(recordsById.values()), {
+    queueItemCount: input.queueItems?.length ?? 0,
+    leaseCount: input.leases?.length ?? 0,
+    semanticRowCount: input.semanticRows?.length ?? 0,
+    terminalDecisionCount: input.terminalDecisions?.length ?? 0
+  });
+
+  return {
+    kind: FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_VIEW_KIND,
+    version: FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_VIEW_VERSION,
+    id: normalizeId(input.id ?? 'dataflow-autonomous-queue-view', 'dataflow autonomous queue view id'),
+    ...(input.title ? { title: input.title } : {}),
+    ...(input.description ? { description: input.description } : {}),
+    summary,
+    ...optionalObject('metadata', input.metadata)
+  };
+}
+
+export function createDataflowAutonomousQueueUtilization(
+  input: FrontierDataflowAutonomousQueueUtilizationInput = {}
+): FrontierDataflowAutonomousQueueUtilization {
+  const samplesById = new Map<string, FrontierDataflowAutonomousQueueUtilizationRankedSample>();
+  const events = normalizeAutonomousQueueUtilizationSamples(input.events ?? [], 'event');
+  const snapshotInputs = (input.snapshots ?? []).concat(input.queueSnapshots ?? []);
+  const snapshots = normalizeAutonomousQueueUtilizationSamples(snapshotInputs, 'snapshot');
+  for (const sample of events.concat(snapshots)) {
+    const previous = samplesById.get(sample.id);
+    if (!previous || sample.rank > previous.rank || (sample.rank === previous.rank && sample.sequence > previous.sequence)) {
+      samplesById.set(sample.id, previous ? mergeAutonomousQueueUtilizationSamples(previous, sample) : sample);
+    }
+  }
+
+  const samples = Array.from(samplesById.values())
+    .sort(compareAutonomousQueueUtilizationSample)
+    .map(stripAutonomousQueueUtilizationRankedSample);
+  const summary = summarizeAutonomousQueueUtilization(samples, {
+    eventCount: input.events?.length ?? 0,
+    snapshotCount: snapshotInputs.length
+  });
+
+  return {
+    kind: FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_UTILIZATION_KIND,
+    version: FRONTIER_DATAFLOW_AUTONOMOUS_QUEUE_UTILIZATION_VERSION,
+    id: normalizeId(input.id ?? 'dataflow-autonomous-queue-utilization', 'dataflow autonomous queue utilization id'),
+    ...(input.title ? { title: input.title } : {}),
+    ...(input.description ? { description: input.description } : {}),
+    summary,
+    samples,
+    ...optionalObject('metadata', input.metadata)
+  };
+}
+
+export function createDataflowModelRoutingRecommendations(
+  input: FrontierDataflowModelRoutingRecommendationsInput = {}
+): FrontierDataflowModelRoutingRecommendations {
+  const outcomes = normalizeModelRoutingOutcomes(input.outcomes ?? []);
+  const windowSize = Math.max(1, Math.floor(input.windowSize ?? 8));
+  const minimumSamples = Math.max(1, Math.floor(input.minimumSamples ?? 2));
+  const promoteThreshold = clampUnit(input.promoteThreshold ?? 0.7);
+  const deprioritizeThreshold = clampUnit(input.deprioritizeThreshold ?? 0.4);
+  const outcomesByModel = new Map<string, FrontierDataflowModelRoutingOutcome[]>();
+  for (const outcome of outcomes) {
+    pushMapObject(outcomesByModel, outcome.modelId, outcome);
+  }
+
+  const recommendations = Array.from(outcomesByModel.entries()).map(([modelId, modelOutcomes]) =>
+    summarizeModelRoutingRecommendation(modelId, modelOutcomes, {
+      windowSize,
+      minimumSamples,
+      promoteThreshold,
+      deprioritizeThreshold
+    })
+  );
+  recommendations.sort(compareModelRoutingRecommendation);
+
+  const summary = summarizeModelRoutingRecommendations(
+    recommendations,
+    outcomes.length,
+    recommendations.reduce((count, recommendation) => count + recommendation.windowedOutcomeCount, 0),
+    windowSize,
+    minimumSamples
+  );
+
+  return {
+    kind: FRONTIER_DATAFLOW_MODEL_ROUTING_RECOMMENDATIONS_KIND,
+    version: FRONTIER_DATAFLOW_MODEL_ROUTING_RECOMMENDATIONS_VERSION,
+    id: normalizeId(input.id ?? 'dataflow-model-routing-recommendations', 'dataflow model routing recommendations id'),
+    ...(input.title ? { title: input.title } : {}),
+    ...(input.description ? { description: input.description } : {}),
+    summary,
+    recommendations,
+    ...optionalObject('metadata', input.metadata)
   };
 }
 
@@ -1187,6 +1554,12 @@ function pushMap(map: Map<string, string[]>, key: string, value: string): void {
   }
 }
 
+function pushMapObject<T>(map: Map<string, T[]>, key: string, value: T): void {
+  const list = map.get(key);
+  if (list) list.push(value);
+  else map.set(key, [value]);
+}
+
 function freezeMapLists(map: Map<string, string[]>): ReadonlyMap<string, readonly string[]> {
   return new Map(Array.from(map, ([key, values]) => [key, Object.freeze(values.slice())]));
 }
@@ -1232,4 +1605,649 @@ function stableStringify(value: JsonValue): string {
   if (Array.isArray(value)) return '[' + value.map(stableStringify).join(',') + ']';
   const keys = Object.keys(value).sort();
   return '{' + keys.map((key) => JSON.stringify(key) + ':' + stableStringify(value[key])).join(',') + '}';
+}
+
+type FrontierDataflowAutonomousQueueSource = 'queue-item' | 'lease' | 'semantic-row' | 'terminal-decision';
+type FrontierDataflowAutonomousQueueLane = 'active' | 'queued' | 'draining' | 'drained' | 'rerun' | 'conflicted' | 'humanQuestion' | 'retired';
+type FrontierDataflowAutonomousQueueUtilizationSourceRank = 1 | 2;
+
+interface FrontierDataflowAutonomousQueueRankedRecord {
+  id: string;
+  lane: FrontierDataflowAutonomousQueueLane;
+  source: FrontierDataflowAutonomousQueueSource;
+  rank: number;
+  sequence: number;
+}
+
+interface FrontierDataflowAutonomousQueueUtilizationRankedSample {
+  id: string;
+  kind: FrontierDataflowAutonomousQueueUtilizationSource;
+  observedAt?: number;
+  sortObservedAt: number;
+  active: number;
+  queued: number;
+  draining: number;
+  drained: number;
+  rerun: number;
+  conflicted: number;
+  humanQuestion: number;
+  retired: number;
+  liveCount: number;
+  totalCount: number;
+  capacity?: number;
+  utilization: number;
+  metadata?: JsonObject;
+  rank: FrontierDataflowAutonomousQueueUtilizationSourceRank;
+  sequence: number;
+}
+
+function normalizeAutonomousQueueRecords(
+  records: readonly FrontierDataflowAutonomousQueueRecordInput[],
+  source: FrontierDataflowAutonomousQueueSource
+): FrontierDataflowAutonomousQueueRankedRecord[] {
+  const out: FrontierDataflowAutonomousQueueRankedRecord[] = [];
+  for (let index = 0; index < records.length; index++) {
+    const record = records[index];
+    out.push(normalizeAutonomousQueueRecord(record, source, index, out.length));
+  }
+  return out;
+}
+
+function normalizeAutonomousQueueUtilizationSamples(
+  records: readonly FrontierDataflowAutonomousQueueUtilizationSampleInput[],
+  kind: FrontierDataflowAutonomousQueueUtilizationSource
+): FrontierDataflowAutonomousQueueUtilizationRankedSample[] {
+  const out: FrontierDataflowAutonomousQueueUtilizationRankedSample[] = [];
+  for (let index = 0; index < records.length; index++) {
+    out.push(normalizeAutonomousQueueUtilizationSample(records[index], kind, index, out.length));
+  }
+  return out;
+}
+
+function normalizeAutonomousQueueUtilizationSample(
+  record: FrontierDataflowAutonomousQueueUtilizationSampleInput,
+  kind: FrontierDataflowAutonomousQueueUtilizationSource,
+  index: number,
+  sequence: number
+): FrontierDataflowAutonomousQueueUtilizationRankedSample {
+  const view = createDataflowAutonomousQueueView({
+    queueItems: record.queueItems,
+    leases: record.leases,
+    semanticRows: record.semanticRows,
+    terminalDecisions: record.terminalDecisions
+  });
+  const observedAt = firstNumber(record.observedAt, record.timestamp, record.time);
+  const active = countOr(record.active, record.activeCount, view.summary.active);
+  const queued = countOr(record.queued, record.queuedCount, view.summary.queued);
+  const draining = countOr(record.draining, record.drainingCount, view.summary.draining);
+  const drained = countOr(record.drained, record.drainedCount, view.summary.drained);
+  const rerun = countOr(record.rerun, record.rerunCount, view.summary.rerun);
+  const conflicted = countOr(record.conflicted, record.conflictedCount, view.summary.conflicted);
+  const humanQuestion = countOr(record.humanQuestion, record.humanQuestionCount, view.summary.humanQuestion);
+  const retired = countOr(record.retired, record.retiredCount, view.summary.retired);
+  const liveCount = countOr(record.liveCount, active + queued + draining, view.summary.liveCount);
+  const totalCount = countOr(record.total, record.totalCount, active + queued + draining + drained + rerun + conflicted + humanQuestion + retired, view.summary.totalCount);
+  const capacity = firstNumber(record.capacity);
+  const rank: FrontierDataflowAutonomousQueueUtilizationSourceRank = kind === 'snapshot' ? 2 : 1;
+  const denominator = Math.max(
+    firstPositiveNumber(capacity, totalCount) ?? 0,
+    liveCount,
+    1
+  );
+  return {
+    id: normalizeId(firstString(record.id, kind + ':' + index), 'dataflow autonomous queue utilization sample id'),
+    kind,
+    ...(observedAt !== undefined ? { observedAt } : {}),
+    sortObservedAt: observedAt ?? Number.POSITIVE_INFINITY,
+    active,
+    queued,
+    draining,
+    drained,
+    rerun,
+    conflicted,
+    humanQuestion,
+    retired,
+    liveCount,
+    totalCount,
+    ...(capacity !== undefined ? { capacity } : {}),
+    utilization: liveCount / denominator,
+    ...optionalObject('metadata', record.metadata),
+    rank,
+    sequence
+  };
+}
+
+function mergeAutonomousQueueUtilizationSamples(
+  previous: FrontierDataflowAutonomousQueueUtilizationRankedSample,
+  next: FrontierDataflowAutonomousQueueUtilizationRankedSample
+): FrontierDataflowAutonomousQueueUtilizationRankedSample {
+  const observedAt = next.observedAt ?? previous.observedAt;
+  const sortObservedAt = observedAt ?? previous.sortObservedAt;
+  return {
+    ...previous,
+    ...next,
+    ...(observedAt !== undefined ? { observedAt } : {}),
+    sortObservedAt,
+    utilization: next.utilization,
+    rank: next.rank > previous.rank ? next.rank : previous.rank,
+    sequence: next.sequence
+  };
+}
+
+function stripAutonomousQueueUtilizationRankedSample(
+  sample: FrontierDataflowAutonomousQueueUtilizationRankedSample
+): FrontierDataflowAutonomousQueueUtilizationSample {
+  const { sortObservedAt: _sortObservedAt, rank: _rank, sequence: _sequence, ...out } = sample;
+  return out;
+}
+
+function compareAutonomousQueueUtilizationSample(
+  left: FrontierDataflowAutonomousQueueUtilizationRankedSample,
+  right: FrontierDataflowAutonomousQueueUtilizationRankedSample
+): number {
+  if (left.sortObservedAt !== right.sortObservedAt) return left.sortObservedAt - right.sortObservedAt;
+  if (left.rank !== right.rank) return left.rank - right.rank;
+  return left.sequence - right.sequence;
+}
+
+function summarizeAutonomousQueueUtilization(
+  samples: readonly FrontierDataflowAutonomousQueueUtilizationSample[],
+  counts: { eventCount: number; snapshotCount: number }
+): FrontierDataflowAutonomousQueueUtilizationSummary {
+  let minUtilization = Number.POSITIVE_INFINITY;
+  let maxUtilization = Number.NEGATIVE_INFINITY;
+  let totalUtilization = 0;
+  let peakObservedAt: number | undefined;
+  let peakUtilization = Number.NEGATIVE_INFINITY;
+  let earliestObservedAt: number | undefined;
+  let latestObservedAt: number | undefined;
+  for (const sample of samples) {
+    minUtilization = Math.min(minUtilization, sample.utilization);
+    maxUtilization = Math.max(maxUtilization, sample.utilization);
+    totalUtilization += sample.utilization;
+    if (sample.observedAt !== undefined) {
+      if (earliestObservedAt === undefined || sample.observedAt < earliestObservedAt) earliestObservedAt = sample.observedAt;
+      if (latestObservedAt === undefined || sample.observedAt > latestObservedAt) latestObservedAt = sample.observedAt;
+      if (sample.utilization >= peakUtilization) {
+        peakUtilization = sample.utilization;
+        peakObservedAt = sample.observedAt;
+      }
+    }
+  }
+  if (samples.length === 0) {
+    minUtilization = 0;
+    maxUtilization = 0;
+    peakUtilization = 0;
+  }
+  return {
+    sampleCount: samples.length,
+    eventCount: counts.eventCount,
+    snapshotCount: counts.snapshotCount,
+    ...(earliestObservedAt !== undefined ? { earliestObservedAt } : {}),
+    ...(latestObservedAt !== undefined ? { latestObservedAt } : {}),
+    minUtilization: minUtilization === Number.POSITIVE_INFINITY ? 0 : minUtilization,
+    averageUtilization: samples.length === 0 ? 0 : totalUtilization / samples.length,
+    maxUtilization: maxUtilization === Number.NEGATIVE_INFINITY ? 0 : maxUtilization,
+    latestUtilization: samples.length ? samples[samples.length - 1].utilization : 0,
+    peakUtilization: peakUtilization === Number.NEGATIVE_INFINITY ? 0 : peakUtilization,
+    ...(peakObservedAt !== undefined ? { peakObservedAt } : {})
+  };
+}
+
+function countOr(...values: unknown[]): number {
+  for (const value of values) {
+    const number = firstNumber(value);
+    if (number !== undefined) return number;
+  }
+  return 0;
+}
+
+function firstNumber(...values: unknown[]): number | undefined {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value)) return value;
+  }
+  return undefined;
+}
+
+function firstPositiveNumber(...values: unknown[]): number | undefined {
+  for (const value of values) {
+    if (typeof value === 'number' && Number.isFinite(value) && value > 0) return value;
+  }
+  return undefined;
+}
+
+function normalizeAutonomousQueueRecord(
+  record: FrontierDataflowAutonomousQueueRecordInput,
+  source: FrontierDataflowAutonomousQueueSource,
+  index: number,
+  sequence: number
+): FrontierDataflowAutonomousQueueRankedRecord {
+  const id = autonomousQueueRecordId(record, source, index);
+  const lane = autonomousQueueRecordLane(record, source);
+  return {
+    id,
+    lane,
+    source,
+    rank: autonomousQueueSourceRank(source) * 10 + autonomousQueueLaneRank(lane),
+    sequence
+  };
+}
+
+function summarizeAutonomousQueueView(
+  records: readonly FrontierDataflowAutonomousQueueRankedRecord[],
+  sourceCounts: {
+    queueItemCount: number;
+    leaseCount: number;
+    semanticRowCount: number;
+    terminalDecisionCount: number;
+  }
+): FrontierDataflowAutonomousQueueViewSummary {
+  const summary: FrontierDataflowAutonomousQueueViewSummary = {
+    totalCount: records.length,
+    liveCount: 0,
+    historicalCount: 0,
+    active: 0,
+    queued: 0,
+    draining: 0,
+    drained: 0,
+    rerun: 0,
+    conflicted: 0,
+    humanQuestion: 0,
+    retired: 0,
+    queueItemCount: sourceCounts.queueItemCount,
+    leaseCount: sourceCounts.leaseCount,
+    semanticRowCount: sourceCounts.semanticRowCount,
+    terminalDecisionCount: sourceCounts.terminalDecisionCount
+  };
+
+  for (const record of records) {
+    if (record.lane === 'active') summary.active++;
+    else if (record.lane === 'queued') summary.queued++;
+    else if (record.lane === 'draining') summary.draining++;
+    else if (record.lane === 'drained') summary.drained++;
+    else if (record.lane === 'rerun') summary.rerun++;
+    else if (record.lane === 'conflicted') summary.conflicted++;
+    else if (record.lane === 'humanQuestion') summary.humanQuestion++;
+    else if (record.lane === 'retired') summary.retired++;
+    if (record.lane === 'active' || record.lane === 'queued' || record.lane === 'draining') summary.liveCount++;
+    else summary.historicalCount++;
+  }
+
+  return summary;
+}
+
+function autonomousQueueRecordId(
+  record: FrontierDataflowAutonomousQueueRecordInput,
+  source: FrontierDataflowAutonomousQueueSource,
+  index: number
+): string {
+  return firstString(
+    record.queueItemId,
+    record.leaseId,
+    record.semanticRowId,
+    record.decisionId,
+    record.taskId,
+    record.id,
+    source + ':' + index
+  );
+}
+
+function autonomousQueueRecordLane(
+  record: FrontierDataflowAutonomousQueueRecordInput,
+  source: FrontierDataflowAutonomousQueueSource
+): FrontierDataflowAutonomousQueueLane {
+  const text = autonomousQueueText(record);
+  const hasQuestion = autonomousQueueHasQuestion(record);
+  if (autonomousQueueHasAny(text, ['retired', 'archived', 'superseded', 'obsolete', 'withdrawn', 'canceled', 'cancelled', 'abandoned', 'tombstoned'])) {
+    return 'retired';
+  }
+  if (hasQuestion) return 'humanQuestion';
+  if (autonomousQueueHasAny(text, ['conflict', 'conflicted', 'merge-conflict', 'blocked-by-conflict', 'conflict-blocked', 'conflict blocked'])) {
+    return 'conflicted';
+  }
+  if (autonomousQueueHasAny(text, ['rerun', 'retry', 'revalidate', 'stale', 'repair', 'missing-evidence', 'missing evidence', 'failed-gate', 'failed gate', 'failed-apply', 'failed apply', 'head-changed', 'head changed', 'current-head', 'current head'])) {
+    return 'rerun';
+  }
+  if (autonomousQueueHasAny(text, ['drained', 'done', 'completed', 'complete', 'applied', 'merged', 'finished', 'closed', 'successful', 'success', 'resolved', 'accepted', 'committed', 'landed'])) {
+    return 'drained';
+  }
+  if (autonomousQueueHasAny(text, ['human-question', 'human question', 'human-blocked', 'human blocked', 'question', 'needs-human', 'needs human']) || autonomousQueueHasAny(text, ['draining', 'drain', 'review', 'coordinator-review', 'review-debt', 'repair', 'blocked', 'processing', 'working', 'running', 'in-flight', 'inflight', 'lease', 'leased'])) {
+    return 'draining';
+  }
+  if (autonomousQueueHasAny(text, ['active', 'running', 'working', 'processing', 'leased', 'busy', 'executing', 'in-flight', 'inflight'])) {
+    return 'active';
+  }
+  if (autonomousQueueHasAny(text, ['queued', 'ready', 'pending', 'waiting', 'backlog', 'scheduled', 'enqueued', 'available', 'reserved'])) {
+    return 'queued';
+  }
+  if (source === 'terminal-decision') return 'drained';
+  if (source === 'semantic-row') return 'draining';
+  if (source === 'lease') return 'active';
+  return 'queued';
+}
+
+function autonomousQueueSourceRank(source: FrontierDataflowAutonomousQueueSource): number {
+  if (source === 'terminal-decision') return 4;
+  if (source === 'semantic-row') return 3;
+  if (source === 'lease') return 2;
+  return 1;
+}
+
+function autonomousQueueLaneRank(lane: FrontierDataflowAutonomousQueueLane): number {
+  if (lane === 'retired') return 8;
+  if (lane === 'humanQuestion') return 7;
+  if (lane === 'conflicted') return 6;
+  if (lane === 'rerun') return 5;
+  if (lane === 'drained') return 4;
+  if (lane === 'draining') return 3;
+  if (lane === 'active') return 2;
+  return 1;
+}
+
+function autonomousQueueText(record: FrontierDataflowAutonomousQueueRecordInput): string {
+  return [
+    record.status,
+    record.state,
+    record.phase,
+    record.lane,
+    record.decision,
+    record.terminalDecision,
+    record.result,
+    record.outcome,
+    record.type,
+    record.reason,
+    record.summary,
+    record.note,
+    record.message
+  ]
+    .map(autonomousQueueTextPart)
+    .filter((value): value is string => !!value)
+    .join(' ')
+    .toLowerCase();
+}
+
+function autonomousQueueTextPart(value: unknown): string {
+  if (typeof value === 'string') return value.trim().replace(/[\s_]+/g, '-').toLowerCase();
+  if (typeof value === 'number' || typeof value === 'boolean') return String(value).trim().toLowerCase();
+  return '';
+}
+
+function autonomousQueueHasQuestion(record: FrontierDataflowAutonomousQueueRecordInput): boolean {
+  return autonomousQueueIsPresent(record.question) || autonomousQueueIsPresent(record.humanQuestion) || autonomousQueueIsPresent(record.questionId) || autonomousQueueIsPresent(record.questionCode);
+}
+
+function autonomousQueueHasAny(text: string, patterns: readonly string[]): boolean {
+  return patterns.some((pattern) => text.includes(pattern));
+}
+
+function autonomousQueueIsPresent(value: unknown): boolean {
+  if (typeof value === 'string') return value.trim().length > 0;
+  if (typeof value === 'number') return Number.isFinite(value);
+  return value !== undefined && value !== null && value !== false;
+}
+
+function normalizeModelRoutingOutcomes(
+  outcomes: readonly FrontierDataflowModelRoutingOutcomeInput[]
+): FrontierDataflowModelRoutingOutcome[] {
+  const out: FrontierDataflowModelRoutingOutcome[] = [];
+  for (let index = 0; index < outcomes.length; index++) {
+    out.push(normalizeModelRoutingOutcome(outcomes[index], index));
+  }
+  return out;
+}
+
+function normalizeModelRoutingOutcome(
+  outcome: FrontierDataflowModelRoutingOutcomeInput,
+  index: number
+): FrontierDataflowModelRoutingOutcome {
+  const modelId = normalizeId(outcome.modelId ?? 'model:' + index, 'model routing outcome model id');
+  const status = compactModelRoutingTextPart(outcome.status, outcome.result, outcome.decision, outcome.outcome, outcome.recommendation) || undefined;
+  return {
+    id: normalizeId(outcome.id ?? modelId + ':' + index, 'model routing outcome id'),
+    modelId,
+    ...(status ? { status } : {}),
+    ...optionalBoolean('success', modelRoutingOutcomeSuccess(outcome)),
+    ...optionalNumber('score', outcome.score),
+    ...optionalNumber('latencyMs', outcome.latencyMs),
+    ...optionalNumber('costUsd', outcome.costUsd),
+    ...optionalNumber('observedAt', outcome.observedAt),
+    ...optionalObject('metadata', outcome.metadata)
+  };
+}
+
+function summarizeModelRoutingRecommendation(
+  modelId: string,
+  outcomes: readonly FrontierDataflowModelRoutingOutcome[],
+  options: {
+    windowSize: number;
+    minimumSamples: number;
+    promoteThreshold: number;
+    deprioritizeThreshold: number;
+  }
+): FrontierDataflowModelRoutingRecommendation {
+  const sorted = outcomes.slice().sort(compareModelRoutingOutcome);
+  const windowed = sorted.slice(Math.max(0, sorted.length - options.windowSize));
+  const successCount = windowed.filter((outcome) => outcome.success === true).length;
+  const failureCount = Math.max(0, windowed.length - successCount);
+  const successRate = windowed.length === 0 ? 0 : successCount / windowed.length;
+  const averageScore = average(windowed.map((outcome) => outcome.score));
+  const averageLatencyMs = average(windowed.map((outcome) => outcome.latencyMs));
+  const averageCostUsd = average(windowed.map((outcome) => outcome.costUsd));
+  const signal = rollingSignal(windowed, successRate, averageScore);
+  const trend = modelRoutingTrend(windowed, successRate, averageScore);
+  const recommendation = modelRoutingRecommendation(signal, trend, windowed.length, options);
+  const reason = modelRoutingReason({
+    recommendation,
+    trend,
+    signal,
+    successCount,
+    windowedOutcomeCount: windowed.length,
+    minimumSamples: options.minimumSamples,
+    promoteThreshold: options.promoteThreshold,
+    deprioritizeThreshold: options.deprioritizeThreshold,
+    usesScore: windowed.some((outcome) => outcome.score !== undefined)
+  });
+
+  return {
+    modelId,
+    outcomeCount: sorted.length,
+    windowedOutcomeCount: windowed.length,
+    successCount,
+    failureCount,
+    successRate,
+    averageScore,
+    averageLatencyMs,
+    averageCostUsd,
+    trend,
+    recommendation,
+    reason,
+    ...(windowed.length ? { lastObservedAt: windowed[windowed.length - 1].observedAt } : {}),
+    ...optionalObject('metadata', aggregateModelRoutingMetadata(windowed))
+  };
+}
+
+function summarizeModelRoutingRecommendations(
+  recommendations: readonly FrontierDataflowModelRoutingRecommendation[],
+  outcomeCount: number,
+  windowedOutcomeCount: number,
+  windowSize: number,
+  minimumSamples: number
+): FrontierDataflowModelRoutingRecommendationsSummary {
+  return {
+    modelCount: recommendations.length,
+    outcomeCount,
+    windowedOutcomeCount,
+    windowSize,
+    minimumSamples,
+    promoteCount: recommendations.filter((recommendation) => recommendation.recommendation === 'promote').length,
+    holdCount: recommendations.filter((recommendation) => recommendation.recommendation === 'hold').length,
+    deprioritizeCount: recommendations.filter((recommendation) => recommendation.recommendation === 'deprioritize').length
+  };
+}
+
+function compareModelRoutingRecommendation(
+  left: FrontierDataflowModelRoutingRecommendation,
+  right: FrontierDataflowModelRoutingRecommendation
+): number {
+  const leftRank = modelRoutingVerdictRank(left.recommendation);
+  const rightRank = modelRoutingVerdictRank(right.recommendation);
+  if (leftRank !== rightRank) return leftRank - rightRank;
+  if (right.averageScore !== left.averageScore) return right.averageScore - left.averageScore;
+  if (right.successRate !== left.successRate) return right.successRate - left.successRate;
+  return left.modelId.localeCompare(right.modelId);
+}
+
+function compareModelRoutingOutcome(left: FrontierDataflowModelRoutingOutcome, right: FrontierDataflowModelRoutingOutcome): number {
+  const leftObservedAt = left.observedAt ?? -Infinity;
+  const rightObservedAt = right.observedAt ?? -Infinity;
+  if (leftObservedAt !== rightObservedAt) return leftObservedAt - rightObservedAt;
+  return left.id.localeCompare(right.id);
+}
+
+function modelRoutingVerdictRank(verdict: FrontierDataflowModelRoutingRecommendationVerdict): number {
+  if (verdict === 'promote') return 0;
+  if (verdict === 'hold') return 1;
+  return 2;
+}
+
+function modelRoutingRecommendation(
+  signal: number,
+  trend: FrontierDataflowModelRoutingRecommendationTrend,
+  sampleCount: number,
+  options: { minimumSamples: number; promoteThreshold: number; deprioritizeThreshold: number }
+): FrontierDataflowModelRoutingRecommendationVerdict {
+  if (sampleCount < options.minimumSamples) return 'hold';
+  if (signal >= options.promoteThreshold && trend !== 'declining') return 'promote';
+  if (signal <= options.deprioritizeThreshold || (trend === 'declining' && signal < options.promoteThreshold)) return 'deprioritize';
+  return 'hold';
+}
+
+function modelRoutingTrend(
+  outcomes: readonly FrontierDataflowModelRoutingOutcome[],
+  successRate: number,
+  averageScore: number
+): FrontierDataflowModelRoutingRecommendationTrend {
+  if (outcomes.length < 4) return 'stable';
+  const mid = Math.max(1, Math.floor(outcomes.length / 2));
+  const older = outcomes.slice(0, mid);
+  const newer = outcomes.slice(mid);
+  const olderSignal = rollingSignal(older, rateFromSuccesses(older), averageModelRoutingScore(older));
+  const newerSignal = rollingSignal(newer, rateFromSuccesses(newer), averageModelRoutingScore(newer));
+  const delta = newerSignal - olderSignal;
+  if (delta > 0.05) return 'improving';
+  if (delta < -0.05) return 'declining';
+  if (averageScore > successRate && newerSignal >= olderSignal) return 'improving';
+  return 'stable';
+}
+
+function rollingSignal(
+  outcomes: readonly FrontierDataflowModelRoutingOutcome[],
+  successRate: number,
+  averageScore: number
+): number {
+  return outcomes.some((outcome) => outcome.score !== undefined) ? averageScore : successRate;
+}
+
+function rateFromSuccesses(outcomes: readonly FrontierDataflowModelRoutingOutcome[]): number {
+  if (outcomes.length === 0) return 0;
+  const successes = outcomes.filter((outcome) => outcome.success === true).length;
+  return successes / outcomes.length;
+}
+
+function averageModelRoutingScore(outcomes: readonly FrontierDataflowModelRoutingOutcome[]): number {
+  return average(outcomes.map((outcome) => outcome.score));
+}
+
+function aggregateModelRoutingMetadata(
+  outcomes: readonly FrontierDataflowModelRoutingOutcome[]
+): JsonObject | undefined {
+  const sources = outcomes.flatMap((outcome) => {
+    const metadata = outcome.metadata;
+    if (!metadata) return [];
+    const model = metadata.model ?? metadata.provider ?? metadata.tier ?? metadata.route;
+    return typeof model === 'string' ? [model] : [];
+  });
+  return sources.length ? { sources: uniqueStrings(sources) } : undefined;
+}
+
+function modelRoutingReason(input: {
+  recommendation: FrontierDataflowModelRoutingRecommendationVerdict;
+  trend: FrontierDataflowModelRoutingRecommendationTrend;
+  signal: number;
+  successCount: number;
+  windowedOutcomeCount: number;
+  minimumSamples: number;
+  promoteThreshold: number;
+  deprioritizeThreshold: number;
+  usesScore: boolean;
+}): string {
+  const signalLabel = input.usesScore ? 'rolling score' : 'rolling success rate';
+  const signalText = formatRatio(input.signal);
+  if (input.windowedOutcomeCount < input.minimumSamples) {
+    return 'holding until the rolling window reaches ' + input.minimumSamples + ' samples (' + input.windowedOutcomeCount + ' seen)';
+  }
+  if (input.recommendation === 'promote') {
+    return signalLabel + ' ' + signalText + ' meets the promote threshold ' + formatRatio(input.promoteThreshold) + '; trend ' + input.trend + '; ' + input.successCount + '/' + input.windowedOutcomeCount + ' recent outcomes succeeded';
+  }
+  if (input.recommendation === 'deprioritize') {
+    return signalLabel + ' ' + signalText + ' is at or below the deprioritize threshold ' + formatRatio(input.deprioritizeThreshold) + '; trend ' + input.trend + '; ' + input.successCount + '/' + input.windowedOutcomeCount + ' recent outcomes succeeded';
+  }
+  return signalLabel + ' ' + signalText + '; trend ' + input.trend + '; keep monitoring the rolling window';
+}
+
+function compactModelRoutingTextPart(...values: unknown[]): string {
+  return values
+    .map((value) => {
+      if (typeof value === 'string') return value.trim().replace(/[\s_]+/g, '-').toLowerCase();
+      if (typeof value === 'number' || typeof value === 'boolean') return String(value).trim().toLowerCase();
+      return '';
+    })
+    .filter((value) => !!value)
+    .join(' ');
+}
+
+function modelRoutingOutcomeSuccess(outcome: FrontierDataflowModelRoutingOutcomeInput): boolean | undefined {
+  if (typeof outcome.succeeded === 'boolean') return outcome.succeeded;
+  const text = compactModelRoutingTextPart(outcome.status, outcome.result, outcome.decision, outcome.outcome, outcome.recommendation);
+  if (modelRoutingTextHasAny(text, ['success', 'succeed', 'passed', 'pass', 'winner', 'win', 'good', 'preferred', 'promote', 'accept', 'accepted'])) return true;
+  if (modelRoutingTextHasAny(text, ['fail', 'failed', 'failure', 'reject', 'rejected', 'bad', 'worse', 'deprioritize', 'downgrade', 'loss'])) return false;
+  return undefined;
+}
+
+function modelRoutingTextHasAny(text: string, patterns: readonly string[]): boolean {
+  return patterns.some((pattern) => text.includes(pattern));
+}
+
+function average(values: readonly (number | undefined)[]): number {
+  const present = values.filter((value): value is number => typeof value === 'number' && Number.isFinite(value));
+  if (present.length === 0) return 0;
+  return present.reduce((sum, value) => sum + value, 0) / present.length;
+}
+
+function optionalBoolean<K extends string>(key: K, value: boolean | undefined): Partial<Record<K, boolean>> {
+  return value === undefined ? {} : ({ [key]: value } as Partial<Record<K, boolean>>);
+}
+
+function optionalNumber<K extends string>(key: K, value: unknown): Partial<Record<K, number>> {
+  const number = typeof value === 'number' && Number.isFinite(value) ? value : undefined;
+  return number === undefined ? {} : ({ [key]: number } as Partial<Record<K, number>>);
+}
+
+function clampUnit(value: number): number {
+  if (value < 0) return 0;
+  if (value > 1) return 1;
+  return value;
+}
+
+function formatRatio(value: number): string {
+  return Number.isFinite(value) ? value.toFixed(2) : '0.00';
+}
+
+function firstString(...values: unknown[]): string {
+  for (const value of values) {
+    if (typeof value !== 'string') continue;
+    const normalized = value.trim();
+    if (normalized) return normalized;
+  }
+  return 'autonomous-queue-item';
 }
